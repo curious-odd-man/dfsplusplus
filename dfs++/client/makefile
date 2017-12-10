@@ -8,3 +8,6 @@ include ../makefiles/makefile
 .PHONY: 
 client: $(TARGET)
 
+
+.PHONY: 
+all: $(TARGET)

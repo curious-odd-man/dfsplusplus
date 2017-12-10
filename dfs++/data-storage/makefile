@@ -1,4 +1,4 @@
-TARGET := bin/dfs-file-manager
+TARGET := bin/dfs-storage
 SRCDIR := src
 COMMONSRCDIR := ../common/src
 BUILDDIR := build
@@ -6,7 +6,7 @@ BUILDDIR := build
 include ../makefiles/makefile
 
 .PHONY: 
-file-manager: $(TARGET)
+storage: $(TARGET)
 
 .PHONY: 
 all: $(TARGET)

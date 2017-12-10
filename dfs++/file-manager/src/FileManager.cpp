@@ -6,7 +6,7 @@
 #include "FileManager.h"
 
 void FileManager::addStorage(const string& host, int port) {
-	cout << "New storage registered: " << host << port << endl;
+	cout << "New storage registered: " << host << " at port " << port << endl;
 	aStorageServices.push_back(make_pair(host, port));
 }
 
@@ -16,6 +16,8 @@ char* FileManager::put(const CmdPackage& request, CmdPackage& response) {
 
 	response.dataSize = DUPLICATION_FACTOR * uniquePartsCount
 			* sizeof(FilePart);
+
+	list<FileChunk>& chunkList = aStoredFiles[request.fname].aChunks;
 
 	char * data = new char[response.dataSize];
 	FilePart* parts = (FilePart*) data;
@@ -30,8 +32,34 @@ char* FileManager::put(const CmdPackage& request, CmdPackage& response) {
 			part.port = aStorageServices[storageId].second;
 			strcpy(part.host, aStorageServices[storageId].first.c_str());
 
+			chunkList.emplace_back(
+					FileChunk(
+							{ storageId, part.index, part.replica_id,
+									part.offset, part.size }));
+
 			cout << part.toString() << endl;
 		}
+	}
+
+	return data;
+}
+
+char* FileManager::get(const CmdPackage& request, CmdPackage& response) {
+
+	list<FileChunk>& chunkList = aStoredFiles.at(request.fname).aChunks;
+	response.dataSize = chunkList.size() * sizeof(FilePart);
+
+	char * data = new char[response.dataSize];
+	FilePart* parts = (FilePart*) data;
+	for (const FileChunk& chunk : chunkList) {
+		FilePart& part = *parts;
+		part.index = chunk.aIndex;
+		part.replica_id = chunk.aReplicaId;
+		part.offset = chunk.offset;
+		part.size = chunk.size;
+		strcpy(part.host, aStorageServices[chunk.aStorageId].first.c_str());
+		part.port = aStorageServices[chunk.aStorageId].second;
+		++parts;
 	}
 
 	return data;

@@ -4,10 +4,12 @@
 
 
 enum CMD {
+	UNKNOWN = 0,
+
 	PUT,
 	GET,
 
-	UNKNOWN
+	REGISTER
 };
 
 struct CmdPackage {
